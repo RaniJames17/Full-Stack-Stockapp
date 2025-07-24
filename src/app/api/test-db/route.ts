@@ -7,7 +7,7 @@ export async function GET() {
     const db = client.db();
     const collections = await db.listCollections().toArray();
     return NextResponse.json({ collections });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
   }
 }

@@ -1,12 +1,14 @@
 interface Props {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }
 
-export default function UserProfile({ params }: Props) {
+export default async function UserProfile({ params }: Props) {
+  const { username } = await params;
+  
   return (
     <main>
-      <h1>User Profile: {params.username}</h1>
-      <p>Welcome to the profile of {params.username}.</p>
+      <h1>User Profile: {username}</h1>
+      <p>Welcome to the profile of {username}.</p>
     </main>
   );
 }
