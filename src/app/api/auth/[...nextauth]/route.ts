@@ -20,7 +20,11 @@ const handler = NextAuth({
         const isValid = await compare(credentials?.password || "", user.password);
         if (!isValid) throw new Error("Invalid password");
 
-        return { id: user._id.toString(), email: user.email, name: user.name };
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          name: user.name,
+        };
       },
     }),
   ],
