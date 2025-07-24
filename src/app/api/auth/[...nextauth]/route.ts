@@ -28,12 +28,26 @@ const handler = NextAuth({
       },
     }),
   ],
-  pages: {
-    signIn: "/login",
-  },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // Refresh session every 24 hours
   },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60,
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      },
+    },
+  },
+  useSecureCookies: process.env.NODE_ENV === 'production', // Enable secure cookies in production
   secret: process.env.NEXTAUTH_SECRET,
 });
 
