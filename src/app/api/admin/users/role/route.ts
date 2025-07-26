@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { logAuditEvent } from "@/lib/audit";
 
 export async function PATCH(req: NextRequest) {
   try {
@@ -26,11 +27,11 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Validate role
-    const validRoles = ["user", "admin", "moderator"];
+    // Validate role (simplified to user/admin only)
+    const validRoles = ["user", "admin"];
     if (!validRoles.includes(newRole)) {
       return NextResponse.json(
-        { error: "Invalid role. Must be user, admin, or moderator" },
+        { error: "Invalid role. Must be user or admin" },
         { status: 400 }
       );
     }
@@ -49,15 +50,23 @@ export async function PATCH(req: NextRequest) {
     const db = client.db();
     const usersCollection = db.collection("users");
 
+    // Get current user data (including current role) before update
+    const targetUser = await usersCollection.findOne({ _id: new ObjectId(userId) });
+    
+    if (!targetUser) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    const previousRole = targetUser.role;
+
     // Edge Case 2: Prevent removal of the last admin
     // Check if we're demoting an admin and if they're the last one
     const adminCount = await db
       .collection("users")
       .countDocuments({ role: "admin" });
-    
-    const targetUser = await db
-      .collection("users")
-      .findOne({ _id: new ObjectId(userId) });
     
     if (targetUser?.role === "admin" && newRole !== "admin" && adminCount === 1) {
       return NextResponse.json(
@@ -78,6 +87,19 @@ export async function PATCH(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Log the audit event after successful role update
+    await logAuditEvent({
+      actorId: session.user.id!,
+      action: "UPDATE_ROLE",
+      targetUserId: userId,
+      details: {
+        previousRole,
+        newRole,
+        userEmail: targetUser.email,
+        timestamp: new Date().toISOString()
+      }
+    });
 
     return NextResponse.json(
       { 

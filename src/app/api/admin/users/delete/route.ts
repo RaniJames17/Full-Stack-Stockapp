@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { logAuditEvent } from "@/lib/audit";
 
 export async function DELETE(req: Request) {
   try {
@@ -48,6 +49,18 @@ export async function DELETE(req: Request) {
     const result = await db.collection("users").deleteOne({ _id: new ObjectId(userId) });
 
     if (result.deletedCount === 1) {
+      // Log the audit event after successful user deletion
+      await logAuditEvent({
+        actorId: session.user.id!,
+        action: "DELETE_USER",
+        targetUserId: userId,
+        details: {
+          deletedUserEmail: userToDelete.email,
+          deletedUserRole: userToDelete.role,
+          timestamp: new Date().toISOString()
+        }
+      });
+
       return NextResponse.json({ 
         success: true, 
         message: `User deleted successfully` 
