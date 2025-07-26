@@ -1,6 +1,10 @@
+"use client";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function HomePage() {
+  const { data: session, status } = useSession();
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Hero Section */}
@@ -14,21 +18,38 @@ export default function HomePage() {
             Built with Next.js 15, MongoDB, and modern authentication.
           </p>
           
-          {/* CTA Buttons */}
-          <div className="flex gap-4 justify-center mb-16">
-            <Link 
-              href="/register" 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg"
-            >
-              Get Started
-            </Link>
-            <Link 
-              href="/login" 
-              className="border border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-lg font-medium transition-colors"
-            >
-              Sign In
-            </Link>
-          </div>
+          {/* CTA Buttons - Only show if not logged in */}
+          {status !== "loading" && !session && (
+            <div className="flex gap-4 justify-center mb-16">
+              <Link 
+                href="/register" 
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg"
+              >
+                Get Started
+              </Link>
+              <Link 
+                href="/login" 
+                className="border border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-lg font-medium transition-colors"
+              >
+                Sign In
+              </Link>
+            </div>
+          )}
+
+          {/* Welcome message and dashboard link for logged in users */}
+          {session && (
+            <div className="mb-16">
+              <p className="text-lg text-gray-700 mb-6">
+                Welcome back, <span className="font-semibold text-blue-600">{session.user?.name || session.user?.email}</span>!
+              </p>
+              <Link 
+                href="/dashboard" 
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg inline-block"
+              >
+                Go to Dashboard
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Features Grid */}
