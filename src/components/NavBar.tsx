@@ -54,6 +54,14 @@ export default function NavBar() {
                 Dashboard
               </Link>
             )}
+            {session?.user?.role === "admin" && (
+              <Link 
+                href="/admin/audit-logs" 
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                Audit Logs
+              </Link>
+            )}
           </div>
         </div>
 
