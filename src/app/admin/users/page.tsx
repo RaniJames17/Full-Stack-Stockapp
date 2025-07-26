@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
@@ -18,7 +17,6 @@ interface UserStats {
 }
 
 export default function AdminUsersPage() {
-  const { data: session } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<UserStats[]>([]);
   const [total, setTotal] = useState(0);

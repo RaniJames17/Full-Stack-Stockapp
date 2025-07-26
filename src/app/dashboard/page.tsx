@@ -1,10 +1,23 @@
 "use client";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { RoleBadge } from "@/components/AdminComponents";
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "access-denied") {
+      setErrorMessage("Access denied: Admin privileges required to access that page.");
+      // Clear the error message after 5 seconds
+      setTimeout(() => setErrorMessage(""), 5000);
+    }
+  }, [searchParams]);
 
   if (status === "loading") {
     return (
@@ -33,6 +46,18 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Error Message Display */}
+        {errorMessage && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              {errorMessage}
+            </div>
+          </div>
+        )}
+        
         {/* Dynamic Header Based on Role */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
           <div className="flex items-center justify-between mb-2">
@@ -331,5 +356,20 @@ function UserDashboard() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }
