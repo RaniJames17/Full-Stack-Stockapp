@@ -5,39 +5,28 @@ export default withAuth(
   function middleware(req) {
     const { pathname } = req.nextUrl;
     
-    // If user is authenticated but not admin, and trying to access admin routes
-    if (pathname.startsWith("/admin") && req.nextauth.token && req.nextauth.token.role !== "admin") {
+    // Only redirect for admin routes if user is not admin
+    if (pathname.startsWith("/admin") && req.nextauth.token?.role !== "admin") {
       const url = req.nextUrl.clone();
       url.pathname = "/dashboard";
       url.searchParams.set("error", "access-denied");
       return NextResponse.redirect(url);
     }
     
-    // Allow access to other protected routes for authenticated users
-    if (req.nextauth.token) {
-      return NextResponse.next();
-    }
+    return NextResponse.next();
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
         
-        // If accessing admin routes
+        // Admin routes require admin role
         if (pathname.startsWith("/admin")) {
-          // Allow if user has admin role
           return token?.role === "admin";
         }
         
-        // For other protected routes, just check if user is authenticated
-        if (pathname.startsWith("/stock-predictor") || 
-            pathname.startsWith("/audit-logs") || 
-            pathname.startsWith("/dashboard")) {
-          return !!token;
-        }
-        
-        // Allow access to all other routes
-        return true;
+        // Other protected routes just need authentication
+        return !!token;
       },
     },
     pages: {
@@ -49,8 +38,8 @@ export default withAuth(
 export const config = {
   matcher: [
     "/admin/:path*",
-    "/stock-predictor/:path*",
-    "/audit-logs/:path*",
-    "/dashboard/:path*"
+    "/stock-predictor",
+    "/audit-logs",
+    "/dashboard"
   ],
 };

@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth-simple";
 
 // Extend NextAuth types
 declare module "next-auth" {
