@@ -296,7 +296,21 @@ function UserDashboard() {
       {/* User Quick Actions */}
       <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Link href="/stock-predictor" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">📈 AI Stock Predictor</p>
+                <p className="text-sm text-gray-500">Predict stock prices with neural networks</p>
+              </div>
+            </div>
+          </Link>
+
           <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
             <div className="flex items-center">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
