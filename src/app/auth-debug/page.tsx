@@ -3,12 +3,38 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
+interface EnvCheck {
+  NODE_ENV: string;
+  NEXTAUTH_URL: string;
+  NEXTAUTH_SECRET: string;
+  MONGODB_URI: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  currentHost: string;
+  protocol: string;
+  fullUrl: string;
+}
+
 export default function AuthDebugPage() {
   const { data: session, status } = useSession();
   const [mounted, setMounted] = useState(false);
+  const [envData, setEnvData] = useState<EnvCheck | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
+    
+    // Fetch server-side environment data
+    fetch('/api/env-check')
+      .then(res => res.json())
+      .then(data => {
+        setEnvData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch env data:', err);
+        setLoading(false);
+      });
   }, []);
 
   if (!mounted) {
@@ -41,9 +67,30 @@ export default function AuthDebugPage() {
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold">Environment</h2>
+            <h2 className="text-lg font-semibold">Server Environment</h2>
+            {loading ? (
+              <p>Loading environment data...</p>
+            ) : envData ? (
+              <div className="bg-gray-100 p-4 rounded text-sm space-y-1">
+                <p><strong>NODE_ENV:</strong> {envData.NODE_ENV}</p>
+                <p><strong>NEXTAUTH_URL:</strong> {envData.NEXTAUTH_URL}</p>
+                <p><strong>NEXTAUTH_SECRET:</strong> {envData.NEXTAUTH_SECRET}</p>
+                <p><strong>MONGODB_URI:</strong> {envData.MONGODB_URI}</p>
+                <p><strong>GOOGLE_CLIENT_ID:</strong> {envData.GOOGLE_CLIENT_ID}</p>
+                <p><strong>GOOGLE_CLIENT_SECRET:</strong> {envData.GOOGLE_CLIENT_SECRET}</p>
+                <p><strong>Current Host:</strong> {envData.currentHost}</p>
+                <p><strong>Protocol:</strong> {envData.protocol}</p>
+                <p><strong>Full URL:</strong> {envData.fullUrl}</p>
+              </div>
+            ) : (
+              <p className="text-red-500">Failed to load environment data</p>
+            )}
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold">Client Environment</h2>
             <p>NODE_ENV: {process.env.NODE_ENV}</p>
-            <p>NEXTAUTH_URL: {process.env.NEXTAUTH_URL || 'Not set'}</p>
+            <p>Current URL: {typeof window !== 'undefined' ? window.location.origin : 'Server-side'}</p>
           </div>
 
           <div className="space-x-4">
