@@ -452,7 +452,7 @@ export default function StockPredictionPage() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
             📈 AI Stock Predictor
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-700 text-lg font-medium">
             Neural network-powered stock price prediction using Brain.js
           </p>
         </div>
@@ -461,49 +461,49 @@ export default function StockPredictionPage() {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex flex-wrap gap-4 justify-center items-end">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Stock Symbol</label>
+              <label className="block text-sm font-bold text-gray-900 mb-2">Stock Symbol</label>
               <select
                 value={symbol}
                 onChange={(e) => setSymbol(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
               >
                 {stockOptions.map(option => (
-                  <option key={option.value} value={option.value}>
+                  <option key={option.value} value={option.value} className="text-gray-900">
                     {option.label}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+              <label className="block text-sm font-bold text-gray-900 mb-2">Date</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Price ($)</label>
+              <label className="block text-sm font-bold text-gray-900 mb-2">Price ($)</label>
               <input
                 type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="Enter price"
                 step="0.01"
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white placeholder-gray-500"
               />
             </div>
             <button
               onClick={addEntry}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold"
             >
               ➕ Add Entry
             </button>
             <button
               onClick={generateSampleData}
               disabled={isGenerating}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-400"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-bold disabled:bg-gray-400"
             >
               {isGenerating ? '🎲 Generating...' : '🎲 Generate Sample'}
             </button>
@@ -512,23 +512,24 @@ export default function StockPredictionPage() {
 
         {/* Data List */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Stock Data ({stockData.length} entries)</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Stock Data ({stockData.length} entries)</h3>
           {stockData.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              📊 No data entries yet<br />
-              <small>Add some data or generate sample data to get started!</small>
+            <div className="text-center py-8 text-gray-600">
+              <div className="text-gray-800 font-medium">📊 No data entries yet</div>
+              <small className="text-gray-700">Add some data or generate sample data to get started!</small>
             </div>
           ) : (
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {stockData.map((entry, i) => (
-                <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span>
-                    <strong>{entry.symbol}</strong> | {entry.date} | 
-                    <span className="text-green-600 font-bold ml-1">${entry.price.toFixed(2)}</span>
+                <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <span className="text-gray-900 font-medium">
+                    <strong className="text-gray-900">{entry.symbol}</strong> | 
+                    <span className="text-gray-800">{entry.date}</span> | 
+                    <span className="text-green-700 font-bold ml-1">${entry.price.toFixed(2)}</span>
                   </span>
                   <button
                     onClick={() => removeEntry(i)}
-                    className="text-red-500 hover:text-red-700 font-bold"
+                    className="text-red-600 hover:text-red-800 font-bold text-lg"
                     title="Remove entry"
                   >
                     ❌
@@ -549,26 +550,26 @@ export default function StockPredictionPage() {
             {isTraining ? '🧠 Training Neural Network...' : '🧠 Train & Predict'}
           </button>
           {stockData.length < 10 && (
-            <p className="text-red-500 text-sm mt-2">Add at least 10 entries to enable prediction</p>
+            <p className="text-red-600 text-sm mt-2 font-medium">Add at least 10 entries to enable prediction</p>
           )}
         </div>
 
         {/* Predictions */}
         {predictions.length > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold mb-4">🔮 Prediction Results</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">🔮 Prediction Results</h3>
             <div className="space-y-3">
               {predictions.map((pred, i) => {
                 const d = new Date(stockData[stockData.length - 1].date);
                 d.setDate(d.getDate() + i + 1);
-                const confidenceColor = pred.confidence > 75 ? 'text-green-600' : pred.confidence > 70 ? 'text-orange-500' : 'text-red-500';
+                const confidenceColor = pred.confidence > 75 ? 'text-green-700' : pred.confidence > 70 ? 'text-orange-600' : 'text-red-600';
                 return (
-                  <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span>
-                      <strong>Day {i + 1}</strong> ({d.toISOString().split("T")[0]}): 
-                      <span className="text-blue-600 font-bold ml-1">${pred.price}</span>
+                  <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <span className="text-gray-900 font-medium">
+                      <strong className="text-gray-900">Day {i + 1}</strong> ({d.toISOString().split("T")[0]}): 
+                      <span className="text-blue-700 font-bold ml-1">${pred.price}</span>
                     </span>
-                    <span className={`font-bold ${confidenceColor}`}>
+                    <span className={`font-bold text-sm ${confidenceColor}`}>
                       {pred.confidence}% confidence
                     </span>
                   </div>
