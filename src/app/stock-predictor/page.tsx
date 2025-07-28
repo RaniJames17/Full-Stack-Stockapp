@@ -583,10 +583,10 @@ export default function StockPredictionPage() {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="h-96">
             {stockData.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full border-2 border-dashed border-gray-300 rounded-lg text-gray-500">
-                <div className="text-6xl mb-4 opacity-50">📈</div>
-                <div className="font-bold mb-2">Stock Price Chart</div>
-                <div className="text-sm">Add stock data or generate sample data to see the chart</div>
+              <div className="flex flex-col items-center justify-center h-full border-2 border-dashed border-gray-400 rounded-lg text-gray-700">
+                <div className="text-6xl mb-4 opacity-60">📈</div>
+                <div className="font-bold mb-2 text-gray-900">Stock Price Chart</div>
+                <div className="text-sm text-gray-700">Add stock data or generate sample data to see the chart</div>
               </div>
             ) : (
               <canvas ref={chartRef}></canvas>
