@@ -13,26 +13,38 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const client = await clientPromise;
-        const db = client.db();
-        const user = await db.collection("users").findOne({ email: credentials?.email });
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            return null;
+          }
 
-        if (!user) throw new Error("User not found");
-        const isValid = await compare(credentials?.password || "", user.password);
-        if (!isValid) throw new Error("Invalid password");
+          const client = await clientPromise;
+          const db = client.db();
+          const user = await db.collection("users").findOne({ email: credentials.email });
 
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          name: user.name,
-          role: user.role || "user",
-        };
+          if (!user) return null;
+          
+          const isValid = await compare(credentials.password, user.password);
+          if (!isValid) return null;
+
+          return {
+            id: user._id.toString(),
+            email: user.email,
+            name: user.name,
+            role: user.role || "user",
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
+          return null;
+        }
       },
     }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? [
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      })
+    ] : []),
   ],
   pages: {
     signIn: "/login",
@@ -41,42 +53,11 @@ export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === 'development', // Enable debug logs in development
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // Refresh session every 24 hours
+    maxAge: 24 * 60 * 60, // 1 day
   },
   jwt: {
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 24 * 60 * 60, // 1 day
   },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        domain: process.env.NODE_ENV === 'production' ? undefined : undefined, // Let browser handle domain automatically
-      },
-    },
-    callbackUrl: {
-      name: `next-auth.callback-url`,
-      options: {
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-    csrfToken: {
-      name: `next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-  },
-  useSecureCookies: process.env.NODE_ENV === 'production',
   callbacks: {
     async signIn({ user, account }) {
       const client = await clientPromise;
